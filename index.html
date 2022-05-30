@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+		<title>🪙 in your git</title>
 
 		<link rel="stylesheet" href="dist/reset.css">
 		<link rel="stylesheet" href="dist/reveal.css">
@@ -16,8 +16,225 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
+				<section data-background-image="assets/img/pexels-david-bartus-366791.jpg" data-background-opacity="0.6">
+					<h2>The secrets in your</h2>
+					<h1>git repository</h1>
+				</section>
+				<section>
+					<h2>06.10.2021</h2>
+					<p class="fragment">6000 internal twitch.tv repositories were leaked to the public</p>
+				</section>
+				<section>
+					<p>Inside the repositories researchers found:</p>
+					<ul>
+						<li class="fragment">194 AWS keys</li>
+						<li class="fragment">69 Twilio keys</li>
+						<li class="fragment">68 Google API keys</li>
+						<li class="fragment">14 Github OAuth keys</li>
+						<li class="fragment">4 Stripe keys</li>
+						<li class="fragment">1000s of passwords</li>
+						<li class="fragment">100s of database connection strings</li>
+						<li class="fragment">100s of private keys</li>
+					</ul>
+				</section>
+				<section>
+					<h3>What if attackers had access to your internal repositories?</h3>
+					<img src="assets/img/you.gif" alt="">
+					<p class="fragment">... would you be worried?</p>
+				</section>
+				<section>
+					<h2>Topics</h2>
+					<ul>
+						<li class="fragment">Why are there credentials in git repositories? 🤔</li>
+						<li class="fragment">Tools to find credentials 🔎</li>
+						<li class="fragment">Mining public git repositories for AWS keys ⛏️</li>
+						<li class="fragment">Where else can credentials be found? 🌳</li>
+						<li class="fragment">API keys and cloud security ☁️</li>
+						<li class="fragment">How can I protect myself? 🛡️</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Why are there credentials in git repositories? 🤔</h2>
+				</section>
+				<section>
+					<img src="assets/img/api-key-example.png" alt="">
+					<p>Secrets are used to authenticate software against external services.</p> 
+				</section>
+				<section>
+					<img src="assets/img/secret-commit.png" alt="" >
+					<p>Secrets are committed by accident</p>
+				</section>
+				<section>
+					<h2>The 4 maturity levels of removal</h2>
+				</section>
+				<section>
+					<h3>Level 0</h3>
+					<img src="assets/img/charmander.png" alt="" width="300">
+					<p>Credentials are not deleted</p>
+				</section>
+				<section>
+					<h3>Level 1</h3>
+					<img src="assets/img/charmeleon.png" alt="" width="300">
+					<p>Commit is created to delete the secret. Still persists in history.</p>
+				</section>
+				<section>
+					<img src="assets/img/secret-remove.png" alt="" width="1200">
+					<p>Still part of the history</p>
+				</section>
+				<section>
+					<h3>Level 2</h3>
+					<img src="assets/img/charizard.png" alt="" width="300">
+					<p>Git history is rewritten. Still vulnerable to monitoring and advanced repository analyis techniques</p>
+				</section>
+				<section>
+					<h3>Level 3</h3>
+					<img src="assets/img/mega-charizard.png" alt="" width="300">
+					<p>Secret is rotated. Can be painful and time consuming.</p>
+				</section>
+				<section>
+					<h2>Did you know...</h2>
+				</section>
+				<section>
+					<img src="assets/img/secret-deletion-rate.png" alt="">
+					<p class="fragment">Secrets not deleted after 24 hours tend to stay forever</p>
+				</section>
+				<section>
+					<h2>Git repositories are everywhere</h2>
+					<ul>
+						<li>Configuration issue of git server</li>
+						<li>Forgotten when making the project open source</li>
+						<li>Local copies are shared</li>
+						<li>Something went horribly wrong on the build server</li>
+						<li>Repository is deployed on a web server</li>
+					</ul>
+				</section>
+				<section>
+					<img src="assets/img/git-everywhere.jpg" alt="">
+					<aside>Tell bug bounty hunter story</aside>
+				</section>
+				<section>
+					<h2>Tools to find credentials 🔎</h2>
+				</section>
+				<section>
+					<h3>Heuristics to identify secrets</h3>
+					<ul>
+						<li>Pattern matching (regex)</li>
+						<li>Entropy</li>
+						<li>Context information</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Trufflehog</h3>
+					<img src="assets/img/trufflehog.png" alt="" width="200">
+					<ul>
+						<li>Major overhaul v3 was released recently</li>
+						<li>Scans the history of a repository for secrets</li>
+						<li>Over 700 credential detectors</li>
+						<li>Support for active verification</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Credentials detectors</h3>
+					<pre><code data-trim data-noescape>
+						idPat  = regexp.MustCompile(`\b((?:AKIA|ABIA|ACCA|ASIA)[0-9A-Z]{16})\b`)
+						keyPat = regexp.MustCompile(`\b([A-Za-z0-9+/]{40})\b`)
+					</code></pre>
+				</section>
+				<section>
+					<h3>Active verification</h3>
+					<pre><code data-trim data-noescape data-line-numbers="1-30|24">
+						// REQUEST VALUES.
+						method := "GET"
+						service := "sts"
+						host := "sts.amazonaws.com"
+						region := "us-east-1"
+						endpoint := "https://sts.amazonaws.com"
+						datestamp := time.Now().UTC().Format("20060102")
+						amzDate := time.Now().UTC().Format("20060102T150405Z0700")
+
+						req, err := http.NewRequestWithContext(ctx, method, endpoint, nil)
+						if err != nil {
+							continue
+						}
+
+						// TASK 1: CREATE A CANONICAL REQUEST.
+						// http://docs.aws.amazon.com/general/latest/gr/sigv4-create-canonical-request.html
+						canonicalURI := "/"
+						canonicalHeaders := "host:" + host + "\n"
+						signedHeaders := "host"
+						algorithm := "AWS4-HMAC-SHA256"
+						credentialScope := fmt.Sprintf("%s/%s/%s/aws4_request", datestamp, region, service)
+
+						params := req.URL.Query()
+						params.Add("Action", "GetCallerIdentity")
+						params.Add("Version", "2011-06-15")
+						params.Add("X-Amz-Algorithm", algorithm)
+						params.Add("X-Amz-Credential", resIdMatch+"/"+credentialScope)
+						params.Add("X-Amz-Date", amzDate)
+						params.Add("X-Amz-Expires", "30")
+						params.Add("X-Amz-SignedHeaders", signedHeaders)
+					</code></pre>
+				</section>
+				<section>
+					<h3>Gitleaks</h3>
+					<ul>
+						<li>Prior to trufflehog v3 most popular tool</li>
+						<li>Similar feature set as trufflehog</li>
+						<li>Does not offer active verification</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Git Hound</h3>
+					<img src="assets/img/githound.png" alt="">
+					<ul>
+						<li>Built for bug hunters / Audits</li>
+						<li>Intensive repository digging</li>
+						<li>Results need to be reviewed manually</li>
+					</ul>
+				</section>
+				<section>
+					<img src="assets/img/gitguardian.png" alt="">
+					
+					<div></div>
+					<ul>
+						<li>Commercial SaaS provider</li>
+						<li>Easy integration in build pipeline</li>
+						<li>Alerting and Dashboards</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Mining public git repositories for AWS keys ⛏️</h2>
+				</section>
+				<section>
+					<h3>Goals of project</h3>
+					<ul>
+						<li>Verify theory that many Developers don't know how to delete accidental secret commits</li>
+						<li>Search for AWS keys</li>
+						<li>Scan many repositories don't distinguish between big projects and small ones</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Rules of engagement</h3>
+					<ul>
+						<li>No destructive operations with obtained credentials</li>
+						<li>No accessing / exfiltration of any data</li>
+						<li>Use credentials only to verify their permission level</li>
+						<li>Notify repository owners afterwards</li>
+					</ul>
+				</section>
+				<section>
+					<img src="assets/img/heres-the-plan-plan.gif" alt="">
+				</section>
+				<section>
+					Use https://excalidraw.com/ to draw diagrams for steps
+				</section>
+				<section>
+					Plan execution. First step GH dorking
+				</section>
+				<section>
+					How to turn that approach around and make it more targeted
+				</section>
 			</div>
 		</div>
 
