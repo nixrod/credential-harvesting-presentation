@@ -8,4 +8,9 @@
 [3] Entropy https://en.wikipedia.org/wiki/Entropy_(information_theory)
 [4] Trufflehog https://github.com/trufflesecurity/truffleHog
 [5] GitLeaks https://github.com/zricethezav/gitleaks
-[6] Git hound https://github.com/tillson/git-hound
+[6] Git Hound https://github.com/tillson/git-hound
+[7] Bug bounties https://tillsongalloway.com/finding-sensitive-information-on-github/index.html
+[8] Github dorking: https://github.com/techgaun/github-dorks
+[9] Santahog: https://github.com/dxa4481/santaHog
+[10] Cloud hacking: malware not needed: https://www.youtube.com/watch?v=C1NjaLO_GB0
+[11] AWS CloudTrail: https://aws.amazon.com/blogs/security/how-to-receive-notifications-when-your-aws-accounts-root-access-keys-are-used/

@@ -57,6 +57,7 @@
 					<h2>Why are there credentials in git repositories? 🤔</h2>
 				</section>
 				<section>
+					<h3>How are API Keys used</h3>
 					<img src="assets/img/api-key-example.png" alt="">
 					<p>Secrets are used to authenticate software against external services.</p> 
 				</section>
@@ -110,7 +111,7 @@
 				</section>
 				<section>
 					<img src="assets/img/git-everywhere.jpg" alt="">
-					<aside>Tell bug bounty hunter story</aside>
+					<aside class="notes">Tell bug bounty hunter story</aside>
 				</section>
 				<section>
 					<h2>Tools to find credentials 🔎</h2>
@@ -227,13 +228,172 @@
 					<img src="assets/img/heres-the-plan-plan.gif" alt="">
 				</section>
 				<section>
-					Use https://excalidraw.com/ to draw diagrams for steps
+					<h3>Step 1: Queries</h3>
+					<img src="assets/img/plan_step1.png" alt="">
+					<p>Run queries against Github Search API</p>
 				</section>
 				<section>
-					Plan execution. First step GH dorking
+					<h3>Step 2: Clean up repository list</h3>
+					<img src="assets/img/plan_step2.png" alt="">
+					<p>First 200 results of each query. Duplicates removed</p>
 				</section>
 				<section>
-					How to turn that approach around and make it more targeted
+					<h3>Step 3: Mine credentials</h3>
+					<img src="assets/img/plan_step3.png" alt="">
+					<p>Repositories >50MB were skipped.</p>
+				</section>
+				<section>
+					<h3>Step 4: Clean up credential list</h3>
+					<img src="assets/img/plan_step4.png" alt="">
+					<p>Unique, verified AWS keys.</p>
+				</section>
+				<section>
+					<h3>Step 5: Verify key privileges</h3>
+					<img src="assets/img/plan_step5.png" alt="">
+					<p>Only test read access to resources.</p>
+				</section>
+				<section>
+					<h3>Notify repository owners</h3>
+					<img src="assets/img/plan_step6.png" alt="">
+					<p>Send notification emails with instructions how to clean up.</p>
+				</section>
+				<section>
+					<img src="assets/img/its-go-time-dog.gif" alt="">
+				</section>
+				<section>
+					<h2>8 Github Queries</h2>
+					<aside class="notes">Explain GH dorking</aside>
+				</section>
+				<section>
+					<h2>1480 unique repositories</h2>
+					<aside class="notes">After cleaning and filtering</aside>
+				</section>
+				<section>
+					<h2>61 unique, verified AWS Keys</h2>
+				</section>
+				<section>
+					<h3>Bycatch</h3>
+					<img src="assets/img/additional_keys.png" alt="">
+				</section>
+				<section>
+					<h3>Of the 61 AWS Keys</h3>
+					<ul>
+						<li>13 Keys with S3 read access</li>
+						<li>26 Keys with DynamoDB read access</li>
+						<li>25 Keys with EC2 read access</li>
+						<li>23 Keys with IAM read access</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Disclosure response</h3>
+					<img src="assets/img/tumbleweed-crickets-chirping.gif" alt="" class="fragment">
+				</section>
+				<section>
+					<h3>A more targeted approach</h3>
+					<img src="assets/img/focus-concentrate.gif" alt="">
+				</section>
+				<section>
+					<h3>A more targeted approach</h3>
+					<ol>
+						<li>Use OSINT to find domains and subdomains of organizations</li>
+						<li>Use github search to find repositories which contain the org domains</li>
+						<li>Filter out usages of public APIs</li>
+						<li>If you find new hostnames, domains and subdomains, repeat</li>
+						<li>Scan all repositories for secrets</li>
+						<li>Don't limit search on github</li>
+					</ol>
+				</section>
+				<section>
+					<h2>Where else can credentials be found? 🌳</h2>
+				</section>
+				<section>
+					<h3>Other places to search</h3>
+					<ul>
+						<li>Gitlab</li>
+						<li>Github Gists</li>
+						<li>Publicly exposed git repsositories</li>
+						<li>Artifact registries</li>
+						<li>Docker images</li>
+						<li>Firmware from hardware</li>
+						<li>Hardcoded in Frontend Applications (Web and mobile)</li>
+					</ul>
+					<aside class="note">Santahog for npm and pypy package registries</aside>
+				</section>
+				<section>
+					<h2>API keys and cloud security ☁️</h2>
+				</section>
+				<section>
+					<h3>Cloud hacking</h3>
+					<a href="https://www.youtube.com/watch?v=C1NjaLO_GB0"><img src="assets/img/cloud-hacking-talk.webp" alt=""></a>
+					<p>Large topic. Different from traditional attacks. Typically does not use malware and exploits</p>
+					<p>Different IOC</p>
+				</section>
+				<section>
+					<h3>Typical attack</h3>
+					<ol>
+						<li>Initial access: Leaked credential or OAuth phishing</li>
+						<li>Enumerate permissions</li>
+						<li>Escalate permissions by finding / creating new credentials</li>
+						<li>Repeat</li>
+					</ol>
+				</section>
+				<section>
+					<h2>How can I protect myself? 🛡️</h2>
+					<img src="assets/img/i-do-not-fear.gif" alt="">
+				</section>
+				<section>
+					<h3>Mitigation</h3>
+					<ul>
+						<li>Onion approach works best</li>
+						<li>Developer education</li>
+						<li>Code reviews</li>
+						<li>Use tooling to detect credentials in build pipeline</li>
+						<li>Try to keep the false positives low!</li>
+						<li>Check for secrets in code before open sourcing or sharing with third parties</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Mitigation</h3>
+					<ul>
+						<li>Follow least privilege principle for service accounts</li>
+						<li>Don't reuse secrets</li>
+						<li>Store production credentials in credential stores like vault.</li>
+						<li>Use CloudTrail / Activity log to monitor activity of keys</li>
+						<li>Delete keys when they are no longer required</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Sources</h2>
+					<ul>
+						<li><a href="https://blog.gitguardian.com/security-threats-from-the-twitch-leak/">Twitch Leaks research</a></li>
+						<li><a href="https://www.ndss-symposium.org/wp-content/uploads/2019/02/ndss2019_04B-3_Meli_paper.pdf">How Bad Can It Git? Characterizing Secret Leakage in Public GitHub Repositories</a></li>
+						<li><a href="https://en.wikipedia.org/wiki/Entropy_(information_theory)">Shannon entropy</a></li>
+						<li><a href="https://github.com/trufflesecurity/truffleHog">TruffleHog</a></li>
+						<li><a href="https://github.com/zricethezav/gitleaks">GitLeaks</a></li>
+						<li><a href="https://github.com/tillson/git-hound">Git Hound</a></li>
+						<li><a href="https://tillsongalloway.com/finding-sensitive-information-on-github/index.html">Credential mining Bug Bounties</a></li>
+						<li><a href="https://github.com/techgaun/github-dorks">Github Dorking</a></li>
+						<li><a href="https://github.com/dxa4481/santaHog">SantaHog</a></li>
+					</ul>
+				</section>
+				<section>
+					<h2>Sources (continued)</h2>
+					<ul>
+						<li><a href="https://www.youtube.com/watch?v=C1NjaLO_GB0">Cloud Hacking - Malware not needed</a></li>
+						<li><a href="https://aws.amazon.com/blogs/security/how-to-receive-notifications-when-your-aws-accounts-root-access-keys-are-used/">AWS Cloud trail</a></li>
+					</ul>
+				</section>
+				<section>
+					<h2>Image Sources</h2>
+					<ul>
+						<li>https://www.pexels.com/photo/light-inside-chest-box-366791/</li>
+						<li>https://sg.portal-pokemon.com/</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Presentation is published on github</h2>
+					<img src="assets/img/qr.gif" alt="" width="300">
+					<p>https://github.com/nixrod/log4shell-presentation</p>
 				</section>
 			</div>
 		</div>
